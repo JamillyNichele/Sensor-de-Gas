@@ -1,25 +1,33 @@
-# gitignore template for TwinCAT3
-# website: https://www.beckhoff.com/twincat3/
-#
-# Recommended: VisualStudio.gitignore
-
-# TwinCAT files
-*.tpy
-*.tclrs
-*.compiled-library
-*.compileinfo
-# Don't include the tmc-file rule if either of the following is true:
-#   1. You've got TwinCAT C++ projects, as the information in the TMC-file is created manually for the C++ projects (in that case, only (manually) ignore the tmc-files for the PLC projects)
-#   2. You've created a standalone PLC-project and added events to it, as these are stored in the TMC-file.
-*.tmc
-*.tmcRefac
-*.library
-*.project.~u
-*.tsproj.bak
-*.xti.bak
-LineIDs.dbg
-LineIDs.dbg.bak
-_Boot/
-_CompileInfo/
-_Libraries/
-_ModuleInstall/
+const int sensorPin = A0; // Pino do sensor de gás (entrada analógica)
+const int ledVerde = 8; // Pino do LED verde (sinal de segurança)
+const int ledVermelho = 9; // Pino do LED vermelho (alerta/perigo)
+const int buzzer = 10; // Pino do buzzer (emite som de alerta)
+int valorLido; // Variável para armazenar a leitura do sensor
+void setup() { 
+ pinMode(ledVerde, OUTPUT); // Configura o pino do LED verde como saída
+ pinMode(ledVermelho, OUTPUT); // Configura o pino do LED vermelho como saída
+ pinMode(buzzer, OUTPUT); // Configura o pino do buzzer como saída
+ Serial.begin(9600); // Inicia a comunicação serial a 9600 bps
+} 
+void loop() { 
+ valorLido = analogRead(sensorPin); // Lê o valor do sensor de gás
+ Serial.print("Valor lido: "); // Imprime o texto "Valor lido: " no monitor 
+ Serial.println(valorLido); // Imprime o valor lido no monitor serial
+ // Verifica a condição do gás baseado no valor lido
+ if (valorLido <= 200) { 
+ digitalWrite(ledVerde, HIGH); // Acende o LED verde (sinal de segurança)
+ digitalWrite(ledVermelho, LOW); // Apaga o LED vermelho
+ digitalWrite(buzzer, LOW); // Desliga o buzzer
+ Serial.println("Condição: Segurança (LED Verde)"); // Imprime no monitor 
+ } else if (valorLido > 200 && valorLido < 400) { 
+ digitalWrite(ledVerde, LOW); // Apaga o LED verde
+ digitalWrite(ledVermelho, HIGH); // Acende o LED vermelho (sinal de alerta)
+ digitalWrite(buzzer, LOW); // Desliga o buzzer
+ Serial.println("Condição: Alerta (LED Vermelho)"); // Imprime no monitor 
+ } else if (valorLido >= 401) { 
+ digitalWrite(ledVerde, LOW); // Apaga o LED verde
+ digitalWrite(ledVermelho, HIGH); // Acende o LED vermelho (sinal de perigo)
+ digitalWrite(buzzer, HIGH); // Liga o buzzer (alarme sonoro)
+ Serial.println("Condição: Perigo (LED Vermelho + Buzzer)"); // Imprime no monitor
+ } 
+ delay (1000); // Pausa de 1 segundo antes de fazer a próxima leitura
